@@ -10,28 +10,31 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 5000;
-
-//connect to mongoDB
+// connect to mongoDB
 mongoose
   .connect(process.env.DATABASE_URL)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log(err));
 
-//create a schema
+// schema
 const urlSchema = new mongoose.Schema({
   originalUrl: { type: String, required: true },
   shortUrl: { type: String, required: true },
   clicks: { type: Number, default: 0 },
 });
-const Url = mongoose.model("Url", urlSchema);
+const Url = mongoose.models.Url || mongoose.model("Url", urlSchema);
+
+// routes
+app.get("/", (req, res) => {
+  res.send("🚀 URL Shortener API is running");
+});
 
 app.post("/api/short", async (req, res) => {
   try {
     const { originalUrl } = req.body;
-    if(!originalUrl){
-        return res.status(400).json({message:"Original URL is required"});
-    } 
+    if (!originalUrl) {
+      return res.status(400).json({ message: "Original URL is required" });
+    }
     const shortUrl = nanoid(8);
     const url = new Url({ originalUrl, shortUrl });
     await url.save();
@@ -50,14 +53,13 @@ app.get("/:shortUrl", async (req, res) => {
   try {
     const { shortUrl } = req.params;
     const url = await Url.findOne({ shortUrl });
-    if(url){
-        url.clicks++;
-        await url.save();
-        return res.redirect(url.originalUrl);
+    if (url) {
+      url.clicks++;
+      await url.save();
+      return res.redirect(url.originalUrl);
     } else {
-        return res.status(404).json({message:"Short URL not found"});
+      return res.status(404).json({ message: "Short URL not found" });
     }
-
   } catch (error) {
     console.log(error);
     res
@@ -66,6 +68,7 @@ app.get("/:shortUrl", async (req, res) => {
   }
 });
 
-//app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+
+// app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
 
 export default app;
