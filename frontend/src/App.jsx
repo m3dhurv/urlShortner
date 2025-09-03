@@ -9,7 +9,7 @@ function App() {
 
 
   const handleSubmit = async () => {
-    axios.post("http://localhost:5000/api/short", { originalUrl })
+    axios.post("https://url-shortner-backend-gilt-theta.vercel.app//api/short", { originalUrl })
 
     .then((res) => {
       setShortUrl(res.data.url.shortUrl);
@@ -37,7 +37,7 @@ function App() {
       shortUrl:{shortUrl && (
         <div className="w-full max-w-md">
           <p className="text-sm text-gray-500">Short URL: {shortUrl}</p>
-          <a href={`http://localhost:5000/${shortUrl}`}>{shortUrl}</a>
+          <a href={`https://url-shortner-backend-gilt-theta.vercel.app//${shortUrl}`}>{shortUrl}</a>
         </div>
       )}
     </div>
